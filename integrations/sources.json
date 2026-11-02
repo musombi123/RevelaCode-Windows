@@ -1,0 +1,17 @@
+{
+  "frontend": {
+    "repository": "musombi123/RevelaCode-Frontend",
+    "defaultRef": "main",
+    "requiredFiles": ["package.json", "index.html", "src/main.jsx"]
+  },
+  "backend": {
+    "repository": "musombi123/RevelaCode-Backend",
+    "defaultRef": "main",
+    "requiredFiles": ["main.py", "backend/db.py", "requirements.txt"]
+  },
+  "revelaai": {
+    "repository": "musombi123/RevelaAI",
+    "defaultRef": "main",
+    "requiredFiles": ["asgi.py", "app.py", "requirements.txt"]
+  }
+}

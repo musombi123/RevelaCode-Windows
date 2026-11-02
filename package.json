@@ -1,0 +1,14 @@
+{
+  "name": "revelacode-windows",
+  "private": true,
+  "version": "0.1.0",
+  "description": "RevelaCode Windows desktop integration host",
+  "scripts": {
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.12.4"
+  }
+}

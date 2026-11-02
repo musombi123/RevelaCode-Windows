@@ -1,0 +1,113 @@
+name: RevelaCode Windows
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      frontend_ref:
+        description: Branch, tag or commit for RevelaCode-Frontend
+        required: true
+        default: main
+        type: string
+      backend_ref:
+        description: Branch, tag or commit for RevelaCode-Backend
+        required: true
+        default: main
+        type: string
+      revelaai_ref:
+        description: Branch, tag or commit for RevelaAI
+        required: true
+        default: main
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows x64 installer
+    runs-on: windows-2022
+    steps:
+      - name: Checkout Windows host
+        uses: actions/checkout@v4
+
+      - name: Resolve companion source refs
+        id: refs
+        shell: pwsh
+        run: |
+          $frontend = "${ github.event.inputs.frontend_ref }"
+          $backend = "${ github.event.inputs.backend_ref }"
+          $revelaai = "${ github.event.inputs.revelaai_ref }"
+          if ([string]::IsNullOrWhiteSpace($frontend)) { $frontend = "main" }
+          if ([string]::IsNullOrWhiteSpace($backend)) { $backend = "main" }
+          if ([string]::IsNullOrWhiteSpace($revelaai)) { $revelaai = "main" }
+          "frontend=$frontend" >> $env:GITHUB_OUTPUT
+          "backend=$backend" >> $env:GITHUB_OUTPUT
+          "revelaai=$revelaai" >> $env:GITHUB_OUTPUT
+
+      - name: Checkout RevelaCode Frontend
+        uses: actions/checkout@v4
+        with:
+          repository: musombi123/RevelaCode-Frontend
+          ref: ${ steps.refs.outputs.frontend }
+          path: workspace/frontend
+
+      - name: Checkout RevelaCode Backend
+        uses: actions/checkout@v4
+        with:
+          repository: musombi123/RevelaCode-Backend
+          ref: ${ steps.refs.outputs.backend }
+          path: workspace/backend
+
+      - name: Checkout RevelaAI
+        uses: actions/checkout@v4
+        with:
+          repository: musombi123/RevelaAI
+          ref: ${ steps.refs.outputs.revelaai }
+          path: workspace/revelaai
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: workspace/frontend/package-lock.json
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Verify all source repositories and record commits
+        shell: pwsh
+        run: node scripts/verify-workspace.mjs
+
+      - name: Install Windows host dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install existing frontend dependencies
+        run: npm --prefix workspace/frontend ci
+
+      - name: Build RevelaCode Desktop
+        run: npm run tauri:build
+
+      - name: Upload installer and source manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: revelacode-windows-x64
+          path: |
+            src-tauri/target/release/bundle/nsis/*-setup.exe
+            artifacts/source-revisions.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish tagged Windows release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            src-tauri/target/release/bundle/nsis/*-setup.exe
+            artifacts/source-revisions.json
