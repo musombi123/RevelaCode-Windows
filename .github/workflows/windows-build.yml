@@ -93,21 +93,39 @@ jobs:
       - name: Build RevelaCode Desktop
         run: npm run tauri:build
 
+      - name: Prepare stable direct-download filename
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem "src-tauri/target/release/bundle/nsis" -Filter "*-setup.exe" | Select-Object -First 1
+          if (-not $installer) { throw "The Tauri NSIS installer was not generated." }
+          Copy-Item $installer.FullName "RevelaCode-Windows-Setup.exe" -Force
+          Write-Host "Prepared direct-download asset: RevelaCode-Windows-Setup.exe"
+
       - name: Upload installer and source manifest
         uses: actions/upload-artifact@v4
         with:
           name: revelacode-windows-x64
           path: |
             src-tauri/target/release/bundle/nsis/*-setup.exe
+            RevelaCode-Windows-Setup.exe
             artifacts/source-revisions.json
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish tagged Windows release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+      - name: Publish direct-download Windows release
+        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-windows-release]'))
+        uses: softprops/action-gh-release@v3
         with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.1.0' }}
+          target_commitish: ${{ github.sha }}
+          name: RevelaCode Windows 0.1.0
+          body: |
+            RevelaCode Desktop for Windows x64.
+
+            Download RevelaCode-Windows-Setup.exe for a direct installer download. The installer includes the WebView2 offline runtime.
           generate_release_notes: true
+          make_latest: true
           files: |
+            RevelaCode-Windows-Setup.exe
             src-tauri/target/release/bundle/nsis/*-setup.exe
             artifacts/source-revisions.json
