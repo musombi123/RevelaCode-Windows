@@ -106,7 +106,6 @@ jobs:
         with:
           name: revelacode-windows-x64
           path: |
-            src-tauri/target/release/bundle/nsis/*-setup.exe
             RevelaCode-Windows-Setup.exe
             artifacts/source-revisions.json
           if-no-files-found: error
@@ -127,5 +126,4 @@ jobs:
           make_latest: true
           files: |
             RevelaCode-Windows-Setup.exe
-            src-tauri/target/release/bundle/nsis/*-setup.exe
             artifacts/source-revisions.json
