@@ -22,6 +22,10 @@ on:
         default: main
         type: string
 
+concurrency:
+  group: revelacode-windows-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
