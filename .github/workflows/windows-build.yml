@@ -37,9 +37,9 @@ jobs:
         id: refs
         shell: pwsh
         run: |
-          $frontend = "${ github.event.inputs.frontend_ref }"
-          $backend = "${ github.event.inputs.backend_ref }"
-          $revelaai = "${ github.event.inputs.revelaai_ref }"
+          $frontend = "${{ github.event.inputs.frontend_ref }}"
+          $backend = "${{ github.event.inputs.backend_ref }}"
+          $revelaai = "${{ github.event.inputs.revelaai_ref }}"
           if ([string]::IsNullOrWhiteSpace($frontend)) { $frontend = "main" }
           if ([string]::IsNullOrWhiteSpace($backend)) { $backend = "main" }
           if ([string]::IsNullOrWhiteSpace($revelaai)) { $revelaai = "main" }
@@ -51,21 +51,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: musombi123/RevelaCode-Frontend
-          ref: ${ steps.refs.outputs.frontend }
+          ref: ${{ steps.refs.outputs.frontend }}
           path: workspace/frontend
 
       - name: Checkout RevelaCode Backend
         uses: actions/checkout@v4
         with:
           repository: musombi123/RevelaCode-Backend
-          ref: ${ steps.refs.outputs.backend }
+          ref: ${{ steps.refs.outputs.backend }}
           path: workspace/backend
 
       - name: Checkout RevelaAI
         uses: actions/checkout@v4
         with:
           repository: musombi123/RevelaAI
-          ref: ${ steps.refs.outputs.revelaai }
+          ref: ${{ steps.refs.outputs.revelaai }}
           path: workspace/revelaai
 
       - name: Set up Node.js
