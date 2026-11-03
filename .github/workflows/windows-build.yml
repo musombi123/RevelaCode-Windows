@@ -95,6 +95,13 @@ jobs:
         run: npm --prefix workspace/frontend ci
 
       - name: Build RevelaCode Desktop
+        env:
+          # Production API origins are embedded by Vite at build time for Tauri WebView.
+          VITE_API_URL: "https://revelacode-backend.onrender.com"
+          VITE_API_BASE_URL: "https://revelacode-backend.onrender.com"
+          VITE_BACKEND_URL: "https://revelacode-backend.onrender.com"
+          VITE_REVELAAI_API_URL: "https://revelaai.onrender.com"
+          VITE_TAURI_APP: "true"
         run: npm run tauri:build
 
       - name: Prepare stable direct-download filename
@@ -119,10 +126,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-windows-release]'))
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.1.1' }}
-          name: RevelaCode Windows 0.1.1
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.1.2' }}
+          name: RevelaCode Windows 0.1.2
           body: |
-            RevelaCode Desktop for Windows x64 (version 0.1.1).
+            RevelaCode Desktop for Windows x64 (version 0.1.2).
 
             Download RevelaCode-Windows-Setup.exe for a direct installer download. The installer includes the WebView2 offline runtime.
           generate_release_notes: true
