@@ -1,3 +1,4 @@
+# [publish-windows-release] Publish signed-off desktop builds to the stable latest-download URL.
 name: RevelaCode Windows
 
 on:
