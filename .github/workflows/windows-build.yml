@@ -48,9 +48,15 @@ jobs:
           if ([string]::IsNullOrWhiteSpace($frontend)) { $frontend = "main" }
           if ([string]::IsNullOrWhiteSpace($backend)) { $backend = "main" }
           if ([string]::IsNullOrWhiteSpace($revelaai)) { $revelaai = "main" }
+          $desktopConfig = Get-Content "src-tauri/tauri.conf.json" -Raw | ConvertFrom-Json
+          $desktopVersion = [string]$desktopConfig.version
+          if ([string]::IsNullOrWhiteSpace($desktopVersion)) { throw "Tauri desktop version is missing." }
+          $desktopTag = "v$desktopVersion"
           "frontend=$frontend" >> $env:GITHUB_OUTPUT
           "backend=$backend" >> $env:GITHUB_OUTPUT
           "revelaai=$revelaai" >> $env:GITHUB_OUTPUT
+          "desktop_version=$desktopVersion" >> $env:GITHUB_OUTPUT
+          "desktop_tag=$desktopTag" >> $env:GITHUB_OUTPUT
 
       - name: Checkout RevelaCode Frontend
         uses: actions/checkout@v4
@@ -127,10 +133,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-windows-release]'))
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.1.2' }}
-          name: RevelaCode Windows 0.1.2
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || steps.refs.outputs.desktop_tag }}
+          name: RevelaCode Windows ${{ steps.refs.outputs.desktop_version }}
           body: |
-            RevelaCode Desktop for Windows x64 (version 0.1.2).
+            RevelaCode Desktop for Windows x64 (version ${{ steps.refs.outputs.desktop_version }}).
 
             Download RevelaCode-Windows-Setup.exe for a direct installer download. The installer includes the WebView2 offline runtime.
           generate_release_notes: true
