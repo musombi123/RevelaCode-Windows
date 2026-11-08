@@ -117,6 +117,7 @@ jobs:
           VITE_BACKEND_URL: "https://revelacode-backend.onrender.com"
           VITE_REVELAAI_API_URL: "https://revelaai.onrender.com"
           VITE_TAURI_APP: "true"
+          VITE_APP_VERSION: ${{ steps.refs.outputs.desktop_version }}
         run: npm run tauri:build
 
       - name: Prepare stable direct-download filename
