@@ -87,3 +87,8 @@ Do not store passwords, JWTs, API keys, payment credentials or other secrets in 
 - Conflicting edits must be detected and surfaced; do not silently overwrite another device's changes.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the integration roadmap.
+
+
+## Licence
+
+Proprietary — All Rights Reserved for original RevelaCode Windows host source and materials. Tauri and other third-party components retain their own licences. See [LICENSE](LICENSE).
